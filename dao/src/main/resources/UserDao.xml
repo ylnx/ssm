@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lx.edu.dao.UserDao">
+    <insert id="save" parameterType="userbean" useGeneratedKeys="true" keyProperty="u_id">
+      insert into stu_user (u_name,u_password)
+      values (#{u_name},#{u_password})
+    </insert>
+
+    <select id="login" parameterType="userbean" resultType="userbean">
+        select * from stu_user where u_name = #{u_name} and u_password = #{u_password};
+    </select>
+
+</mapper>

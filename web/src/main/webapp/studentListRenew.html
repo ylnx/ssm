@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="themes/icon.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $('#dg').datagrid({
+                url:'student/list',
+                columns:[[
+                    {field:'stu_id',checkbox:true,width:100},
+                    {field:'stu_name',title:'学生姓名',width:100},
+                    {field:'stu_parent_name',title:'家长姓名',width:100},
+                    {field:'stu_parent_relative',title:'家长关系',width:100} ,
+                    {field:'stu_parent_phone',title:'家长电话',width:100} ,
+                    {field:'stu_class_name',title:'班级名称',width:100} ,
+                    {field:'stu_lesson_period_total',title:'总课时',width:100} ,
+                    {field:'stu_lesson_period_remainder',title:'剩余课时',width:100} ,
+                    {field:'xxx',title:'操作',width:100,formatter: function(value,row,index){
+                            return "<a href='#' onclick='edit("+row.stu_id+")'>续费</a>";
+                        }
+                    }
+                ]],
+                singleSelect:true,
+                // 显示分页工具条
+                pagination:true,
+                // 初始化的页数
+                pageNumber:1,
+                // 每页显示记录数:
+                pageSize:20,
+                // 分页工具条中下拉列表中的值：
+                pageList:[20,30,50],
+                // 隔行换色
+                striped:true,
+                onLoadSuccess: function (data) {
+                    console.log(data);
+                    if (data == null){
+                        //自定义页面信息加载框
+                        $.messager.show({
+                            title:'提示消息',
+                            msg:"数据为空",
+                            timeout:3000,
+                            showType:'slide'
+                        });
+
+                    }
+                },
+                onLoadError:function (e) {
+                    $.messager.show({
+                        title:'提示消息',
+                        msg:"数据出错",
+                        timeout:3000,
+                        showType:'slide'
+                    });
+                },
+            });
+        })
+
+        function edit(id) {
+            $("#winUpdate").window("open");
+            $('#userId').val(id);
+        }
+        function save(){
+            var id = $('#dlgDelUserId').html();
+            $('#formUpdate').form({
+                url:"student/renew",
+                success:function(data){
+                    var jsonData = eval("("+data+")");
+                    $.messager.show({
+                        title:'提示消息',
+                        msg:"修改成功",
+                        timeout:3000,
+                        showType:'slide'
+                    });
+                    $('#formUpdate').form('clear');
+                    $("#winUpdate").window("close");
+                    $("#dg").datagrid("reload");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<table id="dg"></table>
+
+
+<div id="winUpdate" class="easyui-window" title="续费" style="width:300px;height:250px"
+     data-options="iconCls:'icon-save',modal:true,closed:true">
+    <form id="formUpdate" method="post">
+
+        <TABLE cellSpacing=0 cellPadding=5  border=0>
+            <TR>
+                <td>续费套餐：</td>
+                <td>
+                    <input id="userId" type="hidden" name="stu_id"/>
+                    <input class="easyui-combobox" name="stu_pac_id"
+                           data-options="valueField:'id',textField:'text',url:'package/findPackageforOption'" style="WIDTH: 180px" />
+                </td>
+            </TR>
+
+            <tr>
+                <td colspan="2">
+                    <button style="display:block;margin:0 auto;WIDTH: 90px" onclick="save()">保存</button>
+                </td>
+            </tr>
+        </TABLE>
+    </form>
+</div>
+
+</body>
+</html>

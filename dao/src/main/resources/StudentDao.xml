@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lx.edu.dao.StudentDao">
+    <insert id="save" parameterType="studentbean" useGeneratedKeys="true" keyProperty="stu_id">
+      insert into edu_stu (stu_id,stu_name,stu_parent_name,stu_parent_relative,stu_parent_phone,
+      stu_class_name,stu_lesson_period_total,stu_lesson_period_remainder,stu_cla_id,stu_pac_id,
+      stu_create_time
+      )
+      values (#{stu_id},#{stu_name},#{stu_parent_name},#{stu_parent_relative},#{stu_parent_phone},
+      #{stu_class_name},#{stu_lesson_period_total},#{stu_lesson_period_remainder},#{stu_cla_id},
+      #{stu_pac_id},#{stu_create_time})
+    </insert>
+
+    <insert id="saveToDel" parameterType="studentbean" useGeneratedKeys="true" keyProperty="stu_id">
+      insert into edu_stu_del (stu_id,stu_name,stu_parent_name,stu_parent_relative,stu_parent_phone,
+      stu_class_name,stu_lesson_period_total,stu_lesson_period_remainder,stu_cla_id,stu_pac_id,
+      stu_del_time
+      )
+      values (#{stu_id},#{stu_name},#{stu_parent_name},#{stu_parent_relative},#{stu_parent_phone},
+      #{stu_class_name},#{stu_lesson_period_total},#{stu_lesson_period_remainder},#{stu_cla_id},
+      #{stu_pac_id},#{stu_create_time})
+    </insert>
+
+    <insert id="saveToClass">
+      insert into stu_cla (stu_id,cla_id)
+      values (#{arg0},#{arg1})
+    </insert>
+
+    <update id="updateToClass">
+      update stu_cla set cla_id = #{arg0}
+      where stu_id = #{arg1};
+    </update>
+
+    <update id="deleteToClass">
+      update edu_stu set stu_cla_id = 0,stu_class_name = ""
+      where stu_cla_id = #{arg0};
+    </update>
+
+    <insert id="saveToPackage">
+      insert into stu_pac (stu_id,pac_id)
+      values (#{arg0},#{arg1})
+    </insert>
+
+    <update id="updateToPackage">
+      update stu_pac set pac_id = #{arg2}
+      where id = (select a.* from (select max(id) from stu_pac where stu_id =#{arg0} and pac_id = #{arg1}) a);
+    </update>
+
+    <update id="deleteToPackage">
+      update edu_stu set stu_pac_id = 0
+      where stu_pac_id = #{arg0};
+    </update>
+
+    <select id="findById" parameterType="int" resultType="studentbean">
+        select * from edu_stu where stu_id = #{id};
+    </select>
+
+    <select id="count" resultType="int">
+        select count(*) from edu_stu;
+    </select>
+
+    <update id="update" parameterType="studentbean">
+        update edu_stu set stu_name =#{stu_name},stu_parent_name=#{stu_parent_name},
+        stu_parent_relative=#{stu_parent_relative}, stu_parent_phone=#{stu_parent_phone},
+        stu_class_name=#{stu_class_name}, stu_lesson_period_total=#{stu_lesson_period_total},
+        stu_lesson_period_remainder=#{stu_lesson_period_remainder}, stu_cla_id=#{stu_cla_id},
+        stu_pac_id=#{stu_pac_id}
+        where stu_id=#{stu_id};
+    </update>
+
+    <update id="updateToClassName">
+        update edu_stu set stu_class_name =#{arg1}
+        where stu_cla_id=#{arg0};
+    </update>
+
+    <update id="updateToDuration">
+        update edu_stu set stu_lesson_period_remainder =stu_lesson_period_remainder+#{arg1},
+        stu_lesson_period_total =stu_lesson_period_total+#{arg1}
+        where stu_pac_id=#{arg0};
+    </update>
+
+    <update id="updateToDurationRenew">
+        update edu_stu set stu_lesson_period_remainder =stu_lesson_period_remainder+#{arg2},
+        stu_lesson_period_total =stu_lesson_period_total+#{arg2},
+        stu_pac_id = #{arg1}
+        where stu_id=#{arg0};
+    </update>
+
+    <update id="updateToLessonDuration" parameterType="java.util.List">
+        update edu_stu set stu_lesson_period_remainder =stu_lesson_period_remainder-1
+        <where>
+        <foreach collection="list" item="id" open="stu_id in (" separator="," close=")">
+            #{id}
+        </foreach>
+        </where>
+    </update>
+
+    <delete id="delete" parameterType="int">
+        delete from edu_stu where stu_id=#{id};
+    </delete>
+    <select id="list" resultType="studentbean">
+        select * from edu_stu order by stu_class_name desc
+        <if test="arg0 != null and arg1 != null">
+            limit #{arg0} , #{arg1}
+        </if>
+    </select>
+
+    <select id="findClasses" resultMap="studentbeanforclassMap">
+        select s.* ,c.* from edu_stu s
+        left outer join stu_cla sc on s.stu_id = sc.stu_id
+        left outer join edu_cla c on sc.cla_id = c.cla_id
+        order by s.stu_id asc;
+    </select>
+
+    <select id="findClassesById" resultMap="studentbeanforclassMap" parameterType="int">
+        select s.* ,c.* from edu_stu s
+        left outer join stu_cla sc on s.stu_id = sc.stu_id
+        left outer join edu_cla c on sc.cla_id = c.cla_id
+        where s.stu_id = #{id}
+        order by s.stu_id asc;
+    </select>
+
+    <select id="findPackages" resultMap="studentbeanforpackageMap" >
+        select s.* ,p.* from edu_stu s
+        left outer join stu_pac sp on s.stu_id = sp.stu_id
+        left outer join edu_pac p on sp.pac_id = p.pac_id
+        order by s.stu_id asc;
+    </select>
+
+    <select id="findPackageById" resultMap="studentbeanforpackageMap" parameterType="int">
+        select s.* ,p.* from edu_stu s
+        left outer join stu_pac sp on s.stu_id = sp.stu_id
+        left outer join edu_pac p on sp.pac_id = p.pac_id
+        where s.stu_id = #{id}
+        order by s.stu_id asc;
+    </select>
+    <select id="findClassesAndPackages" resultMap="studentbeanMap">
+        select s.* ,p.*,c.* from edu_stu s
+        left outer join stu_pac sp on s.stu_id = sp.stu_id
+        left outer join edu_pac p on sp.pac_id = p.pac_id
+        left outer join stu_cla sc on s.stu_id = sc.stu_id
+        left outer join edu_cla c on sc.cla_id = c.cla_id
+        <if test="arg0!=null" >
+            where s.stu_id = #{id}
+        </if>
+        order by s.stu_id asc ;
+    </select>
+    <resultMap id="studentbeanforclassMap" type="studentsqlbean">
+        <id column="stu_id" property="stu_id"></id>
+        <result column="stu_name" property="stu_name"></result>
+        <result column="stu_parent_name" property="stu_parent_name"></result>
+        <result column="stu_parent_relative" property="stu_parent_relative"></result>
+        <result column="stu_class_name" property="stu_class_name"></result>
+        <result column="stu_parent_phone" property="stu_parent_phone"></result>
+        <result column="stu_lesson_period_total" property="stu_lesson_period_total"></result>
+        <result column="stu_lesson_period_remainder" property="stu_lesson_period_remainder"></result>
+        <result column="stu_cla_id" property="stu_cla_id"></result>
+        <collection property="classBeans" ofType="classbean">
+            <id column="cla_id" property="cla_id"/>
+            <result column="cla_name" property="cla_name"></result>
+            <result column="cla_teacher" property="cla_teacher"></result>
+            <result column="cla_teacher_phone" property="cla_teacher_phone"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="studentbeanforpackageMap" type="studentsqlbean">
+        <id column="stu_id" property="stu_id"></id>
+        <result column="stu_name" property="stu_name"></result>
+        <result column="stu_parent_name" property="stu_parent_name"></result>
+        <result column="stu_parent_relative" property="stu_parent_relative"></result>
+        <result column="stu_class_name" property="stu_class_name"></result>
+        <result column="stu_parent_phone" property="stu_parent_phone"></result>
+        <result column="stu_lesson_period_total" property="stu_lesson_period_total"></result>
+        <result column="stu_lesson_period_remainder" property="stu_lesson_period_remainder"></result>
+        <result column="stu_cla_id" property="stu_cla_id"></result>
+        <collection property="packageBeans" ofType="packageBean">
+            <id column="pac_id" property="pac_id"/>
+            <result column="pac_duration" property="pac_duration"></result>
+            <result column="pac_content" property="pac_content"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="studentbeanMap" type="studentsqlbean">
+        <id column="stu_id" property="stu_id"></id>
+        <result column="stu_name" property="stu_name"></result>
+        <result column="stu_parent_name" property="stu_parent_name"></result>
+        <result column="stu_parent_relative" property="stu_parent_relative"></result>
+        <result column="stu_class_name" property="stu_class_name"></result>
+        <result column="stu_parent_phone" property="stu_parent_phone"></result>
+        <result column="stu_lesson_period_total" property="stu_lesson_period_total"></result>
+        <result column="stu_lesson_period_remainder" property="stu_lesson_period_remainder"></result>
+        <result column="stu_cla_id" property="stu_cla_id"></result>
+        <collection property="packageBeans" ofType="packageBean">
+            <id column="pac_id" property="pac_id"/>
+            <result column="pac_duration" property="pac_duration"></result>
+            <result column="pac_content" property="pac_content"></result>
+        </collection>
+        <collection property="classBeans" ofType="classbean">
+            <id column="cla_id" property="cla_id"/>
+            <result column="cla_name" property="cla_name"></result>
+            <result column="cla_teacher" property="cla_teacher"></result>
+            <result column="cla_teacher_phone" property="cla_teacher_phone"></result>
+        </collection>
+    </resultMap>
+</mapper>

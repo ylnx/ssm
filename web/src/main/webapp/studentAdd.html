@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="themes/icon.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript">
+        function save(){
+            $('#formAdd').form({
+                url:"student/save",
+                // onsubmit:function(){
+                //     // $('#formAdd')
+                // },
+                success:function(data){
+                    var jsonData = eval("("+data+")");
+                    $.messager.show({
+                        title:'提示消息',
+                        msg:"添加成功",
+                        timeout:3000,
+                        showType:'slide'
+                    });
+                    $('#formAdd').form('clear');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+<div id="winAdd" class="easyui-panel" title="添加学生"
+     data-options="iconCls:'icon-save',fit:true">
+    <form id="formAdd" method="post" accept-charset="UTF-8">
+        <TABLE cellSpacing=0 cellPadding=5 border=0 style="margin: auto">
+            <TR>
+                <td>学生姓名：</td>
+                <td>
+                    <INPUT class=textbox style="WIDTH: 180px" maxLength=50 name="stu_name">
+                </td>
+                <td>家长姓名 ：</td>
+                <td>
+                    <INPUT class=textbox style="WIDTH: 180px" maxLength=50 name="stu_parent_name">
+                </td>
+            </TR>
+
+            <TR>
+                <td>家长关系 ：</td>
+                <td>
+                    <INPUT class=textbox style="WIDTH: 180px" maxLength=50 name="stu_parent_relative">
+                </td>
+                <td>家长电话：</td>
+                <td>
+                    <INPUT class=textbox style="WIDTH: 180px" maxLength=50 name="stu_parent_phone">
+                </td>
+            </TR>
+
+            <TR>
+                <td>所在班级 ：</td>
+                <td>
+                    <input class="easyui-combobox" name="stu_cla_id"
+                           data-options="valueField:'id',textField:'text',url:'class/findClassforOption'" style="WIDTH: 180px" />
+                </td>
+                <td>所选课时套餐：</td>
+                <td>
+                    <input class="easyui-combobox" name="stu_pac_id"
+                           data-options="valueField:'id',textField:'text',url:'package/findPackageforOption'" style="WIDTH: 180px" />
+                </td>
+            </TR>
+
+            <TR>
+                <td>总课时 ：</td>
+                <td>
+                    <INPUT class=textbox style="WIDTH: 180px" maxLength=50 name="stu_lesson_period_total">
+                </td>
+                <td>剩余课时：</td>
+                <td>
+                    <INPUT class=textbox style="WIDTH: 180px" maxLength=50 name="stu_lesson_period_remainder">
+                </td>
+            </TR>
+
+            <tr>
+                <td colspan="4">
+                    <button style="display:block;margin:0 auto;WIDTH: 90px" onclick="save()">保存</button>
+                </td>
+            </tr>
+        </TABLE> 
+    </form>
+</div>
+</body>
+</html>

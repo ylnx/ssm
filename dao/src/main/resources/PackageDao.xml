@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lx.edu.dao.PackageDao">
+    <insert id="save" parameterType="packagebean" useGeneratedKeys="true" keyProperty="pac_id">
+        insert into edu_pac(pac_duration,pac_content)
+        values (#{pac_duration},#{pac_content});
+    </insert>
+
+    <select id="findById" parameterType="int" resultType="packagebean">
+        select * from edu_pac where pac_id = #{id};
+    </select>
+
+    <update id="update" parameterType="packagebean">
+        update edu_pac set pac_duration =#{pac_duration},pac_content=#{pac_content}
+        where pac_id=#{pac_id};
+    </update>
+
+    <delete id="delete" parameterType="int">
+        delete from edu_pac where pac_id=#{id};
+    </delete>
+
+    <select id="count" resultType="int">
+        select count(*) from edu_pac;
+    </select>
+
+    <select id="list" resultType="packagebean">
+        select * from edu_pac order by pac_id asc
+        <if test="arg0 != null and arg1 != null">
+            limit #{arg0} , #{arg1}
+        </if>
+    </select>
+
+    <select id="findStudents" resultMap="packagebeanMap" parameterType="int">
+        select p.*,s.* from edu_pac p  left outer join stu_pac sp on p.pac_id = sp.pac_id
+        left outer join edu_stu s on sp.stu_id = s.stu_id  order by p.pac_id asc ;
+    </select>
+
+    <select id="findStudentsById" resultMap="packagebeanMap" parameterType="int">
+        select p.*,s.* from edu_pac p  left outer join stu_pac sp on p.pac_id = sp.pac_id
+        left outer join edu_stu s on sp.stu_id = s.stu_id  where p.pac_id = #{id};
+    </select>
+
+    <select id="findPackageforOption" resultMap="packageOption">
+        select p.pac_id,p.pac_content from edu_pac p
+    </select>
+
+    <resultMap id="packagebeanMap" type="packagesqlbean">
+        <id column="pac_id" property="pac_id"/>
+        <result column="pac_duration" property="pac_duration"></result>
+        <result column="pac_content" property="pac_content"></result>
+        <collection property="students" ofType="studentbean">
+            <id column="stu_id" property="stu_id"></id>
+            <result column="stu_name" property="stu_name"></result>
+            <result column="stu_parent_name" property="stu_parent_name"></result>
+            <result column="stu_parent_relative" property="stu_parent_relative"></result>
+            <result column="stu_class_name" property="stu_class_name"></result>
+            <result column="stu_parent_phone" property="stu_parent_phone"></result>
+            <result column="stu_lesson_period_total" property="stu_lesson_period_total"></result>
+            <result column="stu_lesson_period_remainder" property="stu_lesson_period_remainder"></result>
+            <result column="stu_cla_id" property="stu_cla_id"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="packageOption" type="optionbean">
+        <id column="pac_id" property="id"/>
+        <result column="pac_content" property="text"></result>
+    </resultMap>
+
+</mapper>

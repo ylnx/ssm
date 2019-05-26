@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lx.edu.dao.ClassDao">
+    <insert id="save" parameterType="classbean" useGeneratedKeys="true" keyProperty="cla_id">
+        insert into edu_cla(cla_name,cla_teacher,cla_teacher_phone)
+        values (#{cla_name},#{cla_teacher},#{cla_teacher_phone});
+    </insert>
+    <select id="findById" parameterType="int" resultType="classbean">
+        select * from edu_cla where cla_id = #{id};
+    </select>
+    <update id="update" parameterType="classbean">
+        update edu_cla set cla_name =#{cla_name},cla_teacher=#{cla_teacher},
+        cla_teacher_phone=#{cla_teacher_phone} where cla_id=#{cla_id};
+    </update>
+
+    <select id="count" resultType="int">
+         select count(*) from edu_cla;
+    </select>
+
+    <delete id="delete" parameterType="int">
+        delete from edu_cla where cla_id=#{id};
+    </delete>
+    <select id="list" resultType="classbean">
+        select * from edu_cla order by cla_id asc
+        <if test="arg0 != null and arg1 != null">
+          limit #{arg0} , #{arg1}
+        </if>
+    </select>
+    <select id="findStudents" resultMap="classbeanMap" parameterType="int">
+        select c.*,s.* from edu_cla c  left outer join stu_cla sc on c.cla_id = sc.cla_id
+        left outer join edu_stu s on sc.stu_id = s.stu_id order by c.cla_id asc;
+    </select>
+    <select id="findStudentsById" resultMap="classbeanMap" parameterType="int">
+        select c.*,s.* from edu_cla c  left outer join stu_cla sc on c.cla_id = sc.cla_id
+        left outer join edu_stu s on sc.stu_id = s.stu_id  where c.cla_id = #{id};
+    </select>
+
+    <select id="findClassforOption" resultMap="classOption">
+        select c.cla_id,c.cla_name from edu_cla c;
+    </select>
+    <resultMap id="classbeanMap" type="classsqlbean">
+        <id column="cla_id" property="cla_id"/>
+        <result column="cla_name" property="cla_name"></result>
+        <result column="cla_teacher" property="cla_teacher"></result>
+        <result column="cla_teacher_phone" property="cla_teacher_phone"></result>
+        <collection property="students" ofType="studentbean">
+            <id column="stu_id" property="stu_id"></id>
+            <result column="stu_name" property="stu_name"></result>
+            <result column="stu_parent_name" property="stu_parent_name"></result>
+            <result column="stu_parent_relative" property="stu_parent_relative"></result>
+            <result column="stu_class_name" property="stu_class_name"></result>
+            <result column="stu_parent_phone" property="stu_parent_phone"></result>
+            <result column="stu_lesson_period_total" property="stu_lesson_period_total"></result>
+            <result column="stu_lesson_period_remainder" property="stu_lesson_period_remainder"></result>
+            <result column="stu_cla_id" property="stu_cla_id"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="classOption" type="optionbean">
+        <id column="cla_id" property="id"/>
+        <result column="cla_name" property="text"></result>
+    </resultMap>
+</mapper>

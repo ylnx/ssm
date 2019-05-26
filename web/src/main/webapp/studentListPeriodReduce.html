@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="themes/icon.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $('#dg').datagrid({
+                url:'student/list',
+                columns:[[
+                    {field:'stu_id',checkbox:true,width:100},
+                    {field:'stu_name',title:'学生姓名',width:100},
+                    {field:'stu_parent_name',title:'家长姓名',width:100},
+                    {field:'stu_parent_relative',title:'家长关系',width:100} ,
+                    {field:'stu_parent_phone',title:'家长电话',width:100} ,
+                    {field:'stu_class_name',title:'班级名称',width:100} ,
+                    {field:'stu_lesson_period_total',title:'总课时',width:100} ,
+                    {field:'stu_lesson_period_remainder',title:'剩余课时',width:100} ,
+                ]],
+                // 显示分页工具条
+                pagination:true,
+                // 初始化的页数
+                pageNumber:1,
+                // 每页显示记录数:
+                pageSize:20,
+                // 分页工具条中下拉列表中的值：
+                pageList:[20,30,50],
+                // 隔行换色
+                striped:true,
+                onLoadSuccess: function (data) {
+                    console.log(data);
+                    if (data == null){
+                        //自定义页面信息加载框
+                        $.messager.show({
+                            title:'提示消息',
+                            msg:"数据为空",
+                            timeout:3000,
+                            showType:'slide'
+                        });
+
+                    }
+                },
+                onLoadError:function (e) {
+                    $.messager.show({
+                        title:'提示消息',
+                        msg:"数据出错",
+                        timeout:3000,
+                        showType:'slide'
+                    });
+                },
+                toolbar: [{
+                    iconCls: 'icon-save',
+                    text:"确定修改",
+                    handler: function(){
+                        var ids = [];
+                        var rows = $('#dg').datagrid('getSelections');
+                        for(var i=0; i<rows.length; i++){
+                            var id = rows[i].stu_id;
+                            console.log(id);
+                            ids.push(rows[i].stu_id);
+                        }
+                        $.ajax({
+                            type:"post",
+                            url:"student/periodReduce",
+                            data:{"ids":ids},
+                            dataType:"json",
+                            success:function(data){
+                                $.messager.show({
+                                    title:'提示消息',
+                                    msg:"操作成功",
+                                    timeout:3000,
+                                    showType:'slide'
+                                });
+                                $("#dg").datagrid("reload");
+                            },
+                            error:function(){
+                                $.messager.show({
+                                    title:'提示消息',
+                                    msg:"数据出错",
+                                    timeout:3000,
+                                    showType:'slide'
+                                });
+                            }
+                        });
+                    }
+                }]
+
+            });
+        })
+
+    </script>
+</head>
+<body>
+<table id="dg"></table>
+
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>爱画美术</title>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="themes/icon.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <style type="text/css">
+        .menuA{
+            text-decoration :none;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(function(){
+            $(".menuA").click(function(){
+                var contentText = this.innerHTML;
+                var url = this.href;
+                createTab(contentText,url);
+                // 超链接就不跳转
+                return false;
+            });
+        });
+
+        function createTab(contentText,url){
+            // 判断选项卡是否存在:
+            var flag = $("#tt").tabs("exists",contentText);
+            if(flag){
+                // 如果已经存在，让其被选中
+                $("#tt").tabs("select",contentText);
+            }else{
+                // 如果不存在,创建新的选项卡
+                $('#tt').tabs('add',{
+                    title:contentText,
+                    content:createUrl(url),
+                    closable:true
+                });
+            }
+        }
+
+        function createUrl(url){
+            return "<iframe src='"+url+"' style='width:100%;height:95%;border:none;'></iframe>";
+        }
+    </script>
+</head>
+<body>
+<div id="cc" class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',title:'CRM管理系统',split:true" style="height:100px;"></div>
+    <div data-options="region:'west',title:'系统菜单',split:true" style="width:200px;">
+        <div id="aa" class="easyui-accordion" data-options="fit:true">
+            <div title="学生管理" data-options="iconCls:'icon-save'" style="overflow:auto;padding:10px;">
+                <a href="studentAdd.html" class="menuA">添加学生</a><br><br>
+                <a href="studentList.html" class="menuA">学生列表</a>
+            </div>
+            <div title="班级管理" data-options="iconCls:'icon-reload'" style="padding:10px;">
+                <a href="classAdd.html" class="menuA">添加班级</a><br><br>
+                <a href="classList.html" class="menuA">班级列表</a>
+            </div>
+            <div title="套餐管理" data-options="iconCls:'icon-help'" style="padding:10px;">
+                <a href="packageAdd.html" class="menuA">添加套餐</a><br><br>
+                <a href="packageList.html" class="menuA">套餐列表</a>
+            </div>
+                <div title="课时管理" data-options="iconCls:'icon-search',selected:true" style="padding:10px;">
+                <a href="studentListPeriodReduce.html" class="menuA">今日上课</a><br><br>
+                <a href="studentListRenew.html" class="menuA">续费套餐</a><br><br>
+                <a href="studentListSms.html" class="menuA">短信通知</a><br><br>
+            </div>
+        </div>
+    </div>
+    <div data-options="region:'center',title:''" style="padding:5px;background:#eee;">
+        <div id="tt" class="easyui-tabs" data-options="fit:true">
+            <div title="数据显示" style="padding:20px;display:none;">
+                数据内容区域
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
