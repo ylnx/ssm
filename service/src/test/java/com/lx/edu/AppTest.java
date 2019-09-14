@@ -29,7 +29,6 @@ public class AppTest
     private StudentService service;
     @Resource(name = "classService")
     private ClassService classService;
-
     @Resource(name = "studentDao")
     private StudentDao studentDao;
 
