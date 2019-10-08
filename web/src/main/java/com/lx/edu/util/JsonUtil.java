@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 描述:
+ * 描述: json工具类
  *
  * @author liaox
  * @create 2019-05-04 10:36
